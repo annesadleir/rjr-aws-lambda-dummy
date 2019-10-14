@@ -1,0 +1,21 @@
+[
+  {"name" : "uk.co.littlestickyleaves.StringRepetitionInstruction",
+    "allPublicConstructors" : true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "uk.co.littlestickyleaves.StringRepetitionResult",
+    "allPublicConstructors" : true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "java.util.List",
+    "allPublicConstructors" : true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "uk.co.littlestickyleaves.aws.lambda.base.api.ErrorJsonShape",
+    "allPublicConstructors" : true,
+    "allPublicMethods": true
+  }
+]

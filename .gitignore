@@ -2,6 +2,7 @@
 *.class
 target/
 /bin
+*.prvn
 
 #Logfile
 *.log

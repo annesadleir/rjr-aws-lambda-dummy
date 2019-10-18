@@ -1,5 +1,5 @@
 # rjr-aws-lambda-dummy
-I wanted to get a Java app running as a custom runtime on AWS Lambda.
+I wanted to get a Java app running as a custom runtime on AWS Lambda.  
 The base code that implements the runtime can be found in [rjr-aws-lambda-base](https://github.com/annesadleir/rjr-aws-lambda-base) repo.
 If you want to build this repo, you'll need to run `mvn clean install` on that repo first to make it available for this one.
 

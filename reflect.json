@@ -14,7 +14,7 @@
     "allPublicMethods": true
   },
   {
-    "name": "uk.co.littlestickyleaves.aws.lambda.base.api.ErrorJsonShape",
+    "name": "uk.co.littlestickyleaves.aws.lambda.base.error.ErrorJsonShape",
     "allPublicConstructors" : true,
     "allPublicMethods": true
   }

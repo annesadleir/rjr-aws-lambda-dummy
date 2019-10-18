@@ -1,7 +1,7 @@
 package uk.co.littlestickyleaves;
 
 /**
- * POJO to hold info about the result of a String Repetition
+ * POJO to hold info about the result of a String Repetition Instruction
  */
 public class StringRepetitionResult {
 

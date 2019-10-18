@@ -2,18 +2,22 @@ package uk.co.littlestickyleaves;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import uk.co.littlestickyleaves.aws.lambda.base.LambdaWorker;
-import uk.co.littlestickyleaves.aws.lambda.base.api.LambdaException;
 
 import java.io.IOException;
 
+/**
+ * A LambdaWorker implementation which repeats a string as instructed
+ */
 public class StringRepeater implements LambdaWorker {
+
+    private final JSON json = JSON.std;
 
     @Override
     public String handleRaw(String rawInput) {
         try {
-            StringRepetitionInstruction instruction = JSON.std.beanFrom(StringRepetitionInstruction.class, rawInput);
+            StringRepetitionInstruction instruction = json.beanFrom(StringRepetitionInstruction.class, rawInput);
             StringRepetitionResult stringRepeatResult = handle(instruction);
-            return JSON.std.asString(stringRepeatResult);
+            return json.asString(stringRepeatResult);
         } catch (IOException e) {
             throw new RuntimeException("Unable to deserialize StringRepeatInstruction from input: " + rawInput, e);
         }

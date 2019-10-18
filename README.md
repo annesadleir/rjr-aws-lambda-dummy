@@ -1,5 +1,15 @@
 # rjr-aws-lambda-dummy
-An example, using toy code
+I wanted to get a Java app running as a custom runtime on AWS Lambda.
+The base code that implements the runtime can be found in [rjr-aws-lambda-base](https://github.com/annesadleir/rjr-aws-lambda-base) repo.
+If you want to build this repo, you'll need to run `mvn clean install` on that repo first to make it available for this one.
+
+I decided to use as my starting point this guide, on which my code is heavily based: \
+['Fighting cold startup issues for your Kotlin Lambda with GraalVM' by Mathias Düsterhöft](https://medium.com/@mathiasdpunkt/fighting-cold-startup-issues-for-your-kotlin-lambda-with-graalvm-39d19b297730) \
+I also used the AWS custom runtime API definition: \
+[AWS Lambda Runtime Interface](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-api.html) \
+which includes a link to a definition of the API in OpenAPI/Swagger format.  I also used \
+['How to Deploy Java Application with Docker and GraalVM' by Vladimír Oraný](https://medium.com/agorapulse-stories/how-to-deploy-java-application-with-docker-and-graalvm-464629d95dbd) \
+and various other web resources like the GraalVM docs and other AWS docs.  And lots of StackOverflow, obvs. 
 
 ## deployment
  There needs to be a `bootstrap` file, as included in this repo.  All this does is start the native executable. 
@@ -30,7 +40,7 @@ Once you have the fat jar, use GraalVM's `native-image` command to create the na
 Make the executable executable (chmod etc).
   
 Place the bootstrap file and the executable into a zip file together: \
-`zip string-repeater.zip bootstrap notkotlin`  
+`zip string-repeater.zip bootstrap string-repeater`  
 This is your deployment package.
 
 # putting it onto AWS
@@ -40,8 +50,10 @@ You'll also need a role for your lambda.  It has to have `AWSLambdaBasicExecutio
 Take note of the role's arn so you can put it into your aws cli command.
 
 Now try this command to make the function: \
-`aws lambda create-function --function-name repeat-string --zip-file fileb://~/linuxWorkarea/string-repeater.zip --handler function.handler --runtime provided --role arn:aws:iam::`YOUR_ROLE_ARN_HERE \
-The zip file has to be referenced with the `fileb://` protocol.  \
+`aws lambda create-function --function-name repeat-string --zip-file `
+`fileb://~/linuxWorkarea/string-repeater.zip --handler function.handler --runtime provided `
+`--role arn:aws:iam::`YOUR_ROLE_ARN_HERE \
+The zip file has to be referenced with the `fileb://` protocol -- but obviously adjust the value to your location.  \
 You should get back some info about the created function. 
 If this is not your first attempt you'll need to delete the previous version: \
 `aws lambda delete-function --function-name repeat-string` \

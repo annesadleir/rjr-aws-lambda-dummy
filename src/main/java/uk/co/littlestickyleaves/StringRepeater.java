@@ -19,7 +19,8 @@ public class StringRepeater implements LambdaWorker {
             StringRepetitionResult stringRepeatResult = handle(instruction);
             return json.asString(stringRepeatResult);
         } catch (IOException e) {
-            throw new RuntimeException("Unable to deserialize StringRepeatInstruction from input: " + rawInput, e);
+            throw new RuntimeException("Unable to deserialize StringRepeatInstruction from input: '" +
+                    rawInput + "'", e);
         }
     }
 

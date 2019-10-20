@@ -35,7 +35,7 @@ Once you have the fat jar, use GraalVM's `native-image` command to create the na
   * you need the `-H:ReflectionConfigurationFiles=reflect.json` bit because otherwise GraalVM doesn't like reflection,
   and Jackson JR uses reflection for serialization and de- of output and in-
   * `-H:+ReportUnsupportedElementsAtRuntime` should report on possible difficulties
-  * `--allow-incomplete-classpath` reports type resolution errors at run time not build time (could be worth trying without)
+  * `--allow-incomplete-classpath` reports type resolution errors at run time not build time (can avoid errors which won't ever be encountered?)
   
 Make the executable executable (chmod etc).
   
@@ -45,18 +45,22 @@ This is your deployment package.
 
 # putting it onto AWS
 
-You'll also need a role for your lambda.  It has to have `AWSLambdaBasicExecutionRole` permissions: \
+You'll also need an IAM role for your lambda.  It has to have `AWSLambdaBasicExecutionRole` permissions: \
 [AWS Lambda Execution Role](https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html) \
 Take note of the role's arn so you can put it into your aws cli command.
 
 Now try this command to make the function: \
-`aws lambda create-function --function-name repeat-string --zip-file `
-`fileb://~/linuxWorkarea/string-repeater.zip --handler function.handler --runtime provided `
+`aws lambda create-function --function-name repeat-string `
+`--zip-file fileb://~/linuxWorkarea/string-repeater.zip --handler function.handler --runtime provided `
 `--role arn:aws:iam::`YOUR_ROLE_ARN_HERE \
-The zip file has to be referenced with the `fileb://` protocol -- but obviously adjust the value to your location.  \
+* the zip file has to be referenced with the `fileb://` protocol -- but obviously adjust the value to your location
+* the `--handler function.handler` bit is required, but is just a pretend value as this base layer cannot be called with different handler values
+* `--runtime provided` lets it know it doesn't need to provide a specific runtime
+* `--role` specifies your specific IAM role with lambda permissions
+
 You should get back some info about the created function. 
 If this is not your first attempt you'll need to delete the previous version: \
-`aws lambda delete-function --function-name repeat-string` \
+`aws lambda delete-function --function-name repeat-string`
 
 Now you can try to invoke the function on AWS like this: \
 `aws lambda invoke --function-name repeat-string --payload '{"input":"beep","repeat":4}' response.txt`\

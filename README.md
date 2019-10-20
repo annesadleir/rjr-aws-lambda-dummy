@@ -25,18 +25,20 @@ The `pom.xml` is set up to create a fat jar, as usual when building Java for AWS
 Once you have the fat jar, use GraalVM's `native-image` command to create the native executable: \
  `native-image --enable-url-protocols=http -cp ./target/rjr-aws-lambda-dummy-1.0.jar \`  
   `-Djava.net.preferIPv4Stack=true \`  
-  `-H:Name=string-repeater -H:Class=uk.co.littlestickyleaves.StringRepeaterMain -H:ReflectionConfigurationFiles=reflect.json \`  
+  `-H:Name=string-repeater -H:Class=uk.co.littlestickyleaves.StringRepeaterMain \`  
   `-H:+ReportUnsupportedElementsAtRuntime --allow-incomplete-classpath`  
   This runs the native-image compiler, which is not snappy.  My understanding of it is only partial, but I think this is how it works:
   * you need the `--enable-url-protocols=http` bit because the executable will use http
   * the `-cp` bit tells it the classpath e.g. the jar you're using
   * you need the `-Djava.net.preferIPv4Stack=true` bit because without it there's an error which seems to be to do with IPv6
   * the Name and Class are pretty self-evident: Name is what the output gets called, and Class is the Main class of the app
-  * you need the `-H:ReflectionConfigurationFiles=reflect.json` bit because otherwise GraalVM doesn't like reflection,
-  and Jackson JR uses reflection for serialization and de- of output and in-
   * `-H:+ReportUnsupportedElementsAtRuntime` should report on possible difficulties
   * `--allow-incomplete-classpath` reports type resolution errors at run time not build time (can avoid errors which won't ever be encountered?)
-  
+ 
+NB GraalVM needs warning about reflection, as used by Jackson JR for creating and reading json.
+This repo has the requisite file in `/META-INF/native-image` where it will be picked up automatically.
+There is a useful tool for creating files like this: [Introducing the Tracing Agent](https://medium.com/graalvm/introducing-the-tracing-agent-simplifying-graalvm-native-image-configuration-c3b56c486271)
+
 Make the executable executable (chmod etc).
   
 Place the bootstrap file and the executable into a zip file together: \
@@ -52,7 +54,7 @@ Take note of the role's arn so you can put it into your aws cli command.
 Now try this command to make the function: \
 `aws lambda create-function --function-name repeat-string `
 `--zip-file fileb://~/linuxWorkarea/string-repeater.zip --handler function.handler --runtime provided `
-`--role arn:aws:iam::`YOUR_ROLE_ARN_HERE \
+`--role arn:aws:iam::`YOUR_ROLE_ARN_HERE
 * the zip file has to be referenced with the `fileb://` protocol -- but obviously adjust the value to your location
 * the `--handler function.handler` bit is required, but is just a pretend value as this base layer cannot be called with different handler values
 * `--runtime provided` lets it know it doesn't need to provide a specific runtime

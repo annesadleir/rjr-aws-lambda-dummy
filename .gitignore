@@ -25,3 +25,10 @@ log/
 mvnw
 mvnw.cmd
 .mvn/
+
+#Cloud9 files
+.classpath
+.factorypath
+.project
+.settings/
+

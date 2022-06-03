@@ -1,51 +1,25 @@
 # rjr-aws-lambda-dummy
-I wanted to get a Java app running as a custom runtime on AWS Lambda.  
-The base code that implements the runtime can be found in [rjr-aws-lambda-base](https://github.com/annesadleir/rjr-aws-lambda-base) repo.
-If you want to build this repo, you'll need to run `mvn clean install` on that repo first to make it available for this one.
+I wanted to get a Java app compiled to a native executable and 
+running as a custom runtime on AWS Lambda.
 
-I decided to use as my starting point this guide, on which my code is heavily based: \
-['Fighting cold startup issues for your Kotlin Lambda with GraalVM' by Mathias Düsterhöft](https://medium.com/@mathiasdpunkt/fighting-cold-startup-issues-for-your-kotlin-lambda-with-graalvm-39d19b297730) \
-I also used the AWS custom runtime API definition: \
-[AWS Lambda Runtime Interface](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-api.html) \
-which includes a link to a definition of the API in OpenAPI/Swagger format.  I also used \
-['How to Deploy Java Application with Docker and GraalVM' by Vladimír Oraný](https://medium.com/agorapulse-stories/how-to-deploy-java-application-with-docker-and-graalvm-464629d95dbd) \
-and various other web resources like the GraalVM docs and other AWS docs.  And lots of StackOverflow, obvs. 
+The base code that implements the runtime can be found in 
+[rjr-aws-lambda-base](https://github.com/annesadleir/rjr-aws-lambda-base) repo.
+If you want to build this repo, 
+you'll need to run `mvn clean install` on that repo first 
+to make it available for this one.
 
-## deployment
- There needs to be a `bootstrap` file, as included in this repo.  All this does is start the native executable. 
- It's the file that the AWS system calls when using a provided runtime.  
- It has to be set to be executable, e.g. `chmod 777 bootstrap`.  
- 
-To compile the code into a native executable using GraalVM, first compile it normally using maven. 
+## build a native executable from Maven
+`mvn package -Pnative`
 
-`mvn clean package` 
+Puts the executable into the `target` folder with the other build artefacts.
 
-The `pom.xml` is set up to create a fat jar, as usual when building Java for AWS Lambdas.
+## deploy it as a custom runtime on AWS Lambda
+There needs to be a `bootstrap` file, as included in this repo.
+All this does is start the native executable. 
+It's the file that the AWS system calls when using a provided runtime.  
+It has to be set to be executable, e.g. `chmod 777 bootstrap`.  
 
-Once you have the fat jar, use GraalVM's `native-image` command to create the native executable: \
- `native-image --enable-url-protocols=http -cp ./target/rjr-aws-lambda-dummy-1.0.jar \`  
-  `-Djava.net.preferIPv4Stack=true \`  
-  `-H:Name=string-repeater -H:Class=uk.co.littlestickyleaves.StringRepeaterMain \`  
-  `-H:+ReportUnsupportedElementsAtRuntime --allow-incomplete-classpath`  
-  This runs the native-image compiler, which is not snappy.  My understanding of it is only partial, but I think this is how it works:
-  * you need the `--enable-url-protocols=http` bit because the executable will use http
-  * the `-cp` bit tells it the classpath e.g. the jar you're using
-  * you need the `-Djava.net.preferIPv4Stack=true` bit because without it there's an error which seems to be to do with IPv6
-  * the Name and Class are pretty self-evident: Name is what the output gets called, and Class is the Main class of the app
-  * `-H:+ReportUnsupportedElementsAtRuntime` should report on possible difficulties
-  * `--allow-incomplete-classpath` reports type resolution errors at run time not build time (can avoid errors which won't ever be encountered?)
- 
-NB GraalVM needs warning about reflection, as used by Jackson JR for creating and reading json.
-This repo has the requisite file in `/META-INF/native-image` where it will be picked up automatically.
-There is a useful tool for creating files like this: [Introducing the Tracing Agent](https://medium.com/graalvm/introducing-the-tracing-agent-simplifying-graalvm-native-image-configuration-c3b56c486271)
-
-Make the executable executable (chmod etc).
-  
-Place the bootstrap file and the executable into a zip file together: \
-`zip string-repeater.zip bootstrap string-repeater`  
-This is your deployment package.
-
-# putting it onto AWS
+The native executable built in the previous step also needs to be set to be executable.
 
 You'll also need an IAM role for your lambda.  It has to have `AWSLambdaBasicExecutionRole` permissions: \
 [AWS Lambda Execution Role](https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html) \
@@ -73,4 +47,24 @@ Here is a response.txt contents from a successful invocation: \
 `{"input":"neenah","repeat":9,"result":"neenahneenahneenahneenahneenahneenahneenahneenahneenah"}` \
 If it has failed, more detail can be got from looking at the CloudWatch logs in the AWS console.  The error message may be somewhat opaque.
  
-Feedback appreciated.
+
+## or deploy it as a container on AWS Lambda
+
+### Build the native executable into a Docker container
+Using the provided Dockerfile:  
+`docker build -t string repeater .`
+
+### Push the container to ECR  
+[Using aws cli](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-upload)
+
+### Deploy as a lambda from the GUI  
+After clicking 'Create Function' choose the container option from the large buttons at the top.
+
+
+
+
+## Next step
+1. Repeat with a distroless docker container.
+
+For the old readme, see [docs/2019-readme.md](docs/2019-readme.md)
+

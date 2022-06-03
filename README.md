@@ -60,11 +60,9 @@ Using the provided Dockerfile:
 ### Deploy as a lambda from the GUI  
 After clicking 'Create Function' choose the container option from the large buttons at the top.
 
-
-
-
 ## Next step
 1. Repeat with a distroless docker container.
+2. *NEEDS to be in 2 steps*
 
 For the old readme, see [docs/2019-readme.md](docs/2019-readme.md)
 

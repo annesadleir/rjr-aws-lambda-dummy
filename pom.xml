@@ -56,7 +56,7 @@
                         </executions>
                         <configuration>
                             <skip>false</skip>
-                            <imageName>string-repeater</imageName>
+                            <imageName>string-repeater-distroless</imageName>
                             <mainClass>uk.co.littlestickyleaves.StringRepeaterMain</mainClass>
                             <classpath>
                                 <param>
@@ -75,6 +75,9 @@
                                 </buildArg>
                                 <buildArg>
                                     -Djava.net.preferIPv4Stack=true
+                                </buildArg>
+                                <buildArg>
+                                    -H:+StaticExecutableWithDynamicLibC
                                 </buildArg>
                             </buildArgs>
                         </configuration>

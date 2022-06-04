@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM gcr.io/distroless/base
+FROM amazonlinux
 
 # copy the executable
 COPY target/string-repeater .

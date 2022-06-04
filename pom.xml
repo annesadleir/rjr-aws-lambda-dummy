@@ -56,6 +56,52 @@
                         </executions>
                         <configuration>
                             <skip>false</skip>
+                            <imageName>string-repeater</imageName>
+                            <mainClass>uk.co.littlestickyleaves.StringRepeaterMain</mainClass>
+                            <classpath>
+                                <param>
+                                    rjr-aws-lambda-dummy-1.0-shaded.jar
+                                </param>
+                            </classpath>
+                            <buildArgs>
+                                <buildArg>
+                                    --no-fallback  
+                                </buildArg>
+                                <buildArg>
+                                    -H:+ReportExceptionStackTraces  
+                                </buildArg>
+                                <buildArg>
+                                    --enable-https
+                                </buildArg>
+                                <buildArg>
+                                    -Djava.net.preferIPv4Stack=true
+                                </buildArg>
+                            </buildArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>distroless</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>0.9.11</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>build-native</id>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <skip>false</skip>
                             <imageName>string-repeater-distroless</imageName>
                             <mainClass>uk.co.littlestickyleaves.StringRepeaterMain</mainClass>
                             <classpath>

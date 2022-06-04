@@ -60,9 +60,28 @@ Using the provided Dockerfile:
 ### Deploy as a lambda from the GUI  
 After clicking 'Create Function' choose the container option from the large buttons at the top.
 
-## Next step
-1. Repeat with a distroless docker container.
-2. *NEEDS to be in 2 steps*
+## build mostly statically-linked native executable and deploy distroless
+### Build the native executable using the distoless profile:  
 
-For the old readme, see [docs/2019-readme.md](docs/2019-readme.md)
+`mvn package -Pdistroless`
+
+This is exactly the same as the native profile but with one extra command-line option:  
+`-H:+StaticExecutableWithDynamicLibC`
+
+This creates an executable with is statically linked except for glibc.
+
+### Build the container using Dockerfile.distroless
+
+`docker build -f Dockerfile.distroless -t string-repeater-distroless .`
+
+This is a two-stage build, for two reasons
+1. it needs to be able to change the permissions on the executable before it's copied to the container
+2. it needs to be able to copy over libz.so.1 to the container
+
+Therefore it needs a first stage on an image which has working tools available.
+
+### Push the container to ECR and deploy on lambda 
+As above, [using aws cli](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-upload)
+
+## For the old readme, see [docs/2019-readme.md](docs/2019-readme.md)
 

@@ -1,0 +1,22 @@
+# syntax=docker/dockerfile:1
+
+# build container
+FROM debian:stable-slim AS build-env
+
+# copy the executable
+COPY target/string-repeater /app/
+
+# make it executable
+RUN chmod +x app/string-repeater
+
+# now the deployment image
+FROM gcr.io/distroless/base
+
+# copy over the executable
+COPY --from=build-env app/string-repeater /app/
+COPY --from=build-env /lib/x86_64-linux-gnu/libz.so.1 /lib/x86_64-linux-gnu/libz.so.1
+
+WORKDIR /app
+
+# start the executable
+ENTRYPOINT ["./string-repeater"]

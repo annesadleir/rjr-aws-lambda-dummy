@@ -52,7 +52,7 @@ If it has failed, more detail can be got from looking at the CloudWatch logs in 
 
 ### Build the native executable into a Docker container
 Using the provided Dockerfile:  
-`docker build -t string repeater .`
+`docker build -t string-repeater .`
 
 ### Push the container to ECR  
 [Using aws cli](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-upload)
